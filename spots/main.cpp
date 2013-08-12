@@ -1,7 +1,5 @@
 #include <windows.h>
 
-#include <iostream>
-#include <sstream>
 #include <cstdint>
 #include <cstdio>
 #include <cmath>

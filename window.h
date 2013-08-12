@@ -1,7 +1,7 @@
 #ifndef __WINDOW_H__
 #define __WINDOW_H__
 
-static const char *	class_name				= "x_window_cls_x86";
+static const char *	class_name = "x_window_cls_x86";
 
 class window {
 	static int	m_ref_count;
@@ -16,16 +16,6 @@ class window {
 				window *p = (window *)((LPCREATESTRUCT)lParam)->lpCreateParams;
 				SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR)p );
 			} break;
-
-#if 0
-			case WM_NCHITTEST:
-				/*POINT	pt;
-				pt.x = LOWORD( lParam );
-				pt.y = HIWORD( lParam );
-				ScreenToClient( hWnd, &pt );
-				if ( pt.y < 10 )*/ return HTCAPTION;
-				break;
-#endif
 
 			case WM_PAINT: {
 				PAINTSTRUCT	ps;
@@ -107,7 +97,7 @@ public:
 		if ( x == -1 ) x = GetSystemMetrics( SM_CXSCREEN ) / 2 - m_w * scale / 2;
 		if ( y == -1 ) y = GetSystemMetrics( SM_CYSCREEN ) / 2 - m_h * scale / 2;
 
-		m_wnd = CreateWindow( /*WS_EX_TOPMOST, */class_name, NULL, WS_POPUP | WS_VISIBLE, x, y, m_w * scale, m_h * scale, NULL, NULL, GetModuleHandle( NULL ), (LPVOID)this );
+		m_wnd = CreateWindow( class_name, NULL, WS_POPUP | WS_VISIBLE, x, y, m_w * scale, m_h * scale, NULL, NULL, GetModuleHandle( NULL ), (LPVOID)this );
 		update();
 	}
 
@@ -117,13 +107,6 @@ public:
 		if ( !m_ref_count ) {
 			UnregisterClass( class_name, GetModuleHandle( NULL ) );
 		}
-	}
-
-	void clear( uint32_t color ) {
-		__asm__ (
-			"rep stosd"
-			: : "D" (m_ptr), "a" (color), "c" (m_w * m_h)
-			: "memory" );
 	}
 
 	void update() {
