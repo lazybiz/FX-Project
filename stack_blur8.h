@@ -10,11 +10,11 @@
 // Contact: lazybiz@yandex.ru
 //----------------------------------------------------------------------------
 
-
+//----------------------------------------------------------------------------
 //
 // Stack Blur algorithm implementation. Thanks to Mario Klingemann - the author.
-//  and Maxim Shemanarev for C++ implementation.
 //
+//----------------------------------------------------------------------------
 
 #ifndef	__STACK_BLUR8_H__
 #define	__STACK_BLUR8_H__
@@ -111,7 +111,7 @@ public:
 					sum_out += pix;
 				}
 				for ( i = 1; i <= rx; i++ ) {
-					if ( i <= wm ) src_pix_ptr += 1;//Img::pix_step; 
+					if ( i <= wm ) src_pix_ptr++;
 					pix = *src_pix_ptr; 
 					stack[i + rx] = pix;
 					sum    += pix * (rx + 1 - i);
@@ -124,13 +124,13 @@ public:
 				dst_pix_ptr = img.pix_ptr(  0, y );
 				for ( x = 0; x < w; x++ ) {
 					*dst_pix_ptr = (sum * mul_sum) >> shr_sum;
-					dst_pix_ptr += 1;//Img::pix_step;
+					dst_pix_ptr++;
 					sum -= sum_out;
 					stack_start = stack_ptr + div - rx;
 					if ( stack_start >= div ) stack_start -= div;
 					sum_out -= stack[stack_start];
 					if ( xp < wm ) {
-						src_pix_ptr += 1;//Img::pix_step;
+						src_pix_ptr++;
 						pix = *src_pix_ptr;
 						++xp;
 					}

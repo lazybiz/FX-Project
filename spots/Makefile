@@ -1,8 +1,8 @@
 APP = main
-CFL	= -c -Wall -std=c++11 -masm=intel -fopenmp -O3
+CFL = -c -Wall -std=c++11 -masm=intel -fopenmp -O3
 LFL = -s -static -mwindows
-SRC	= $(APP).cpp
-OBJ	= $(SRC:.cpp=.o)
+SRC = $(APP).cpp
+OBJ = $(SRC:.cpp=.o)
 LIB = -lgomp -lgdi32
 
 all: $(OBJ)
