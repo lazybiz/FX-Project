@@ -1,3 +1,21 @@
+//----------------------------------------------------------------------------
+// FX Project
+// Copyright (C) 2013 Anton Sazonov (lazybiz)
+//
+// Permission to copy, use, modify, sell and distribute this software 
+// is granted provided this copyright notice appears in all copies. 
+// This software is provided "as is" without express or implied
+// warranty, and with no claim as to its suitability for any purpose.
+//
+// Contact: lazybiz@yandex.ru
+//----------------------------------------------------------------------------
+
+
+//
+// Stack Blur algorithm implementation. Thanks to Mario Klingemann - the author.
+//  and Maxim Shemanarev for C++ implementation.
+//
+
 #ifndef	__STACK_BLUR8_H__
 #define	__STACK_BLUR8_H__
 

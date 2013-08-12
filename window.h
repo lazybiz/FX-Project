@@ -1,3 +1,15 @@
+//----------------------------------------------------------------------------
+// FX Project
+// Copyright (C) 2013 Anton Sazonov (lazybiz)
+//
+// Permission to copy, use, modify, sell and distribute this software 
+// is granted provided this copyright notice appears in all copies. 
+// This software is provided "as is" without express or implied
+// warranty, and with no claim as to its suitability for any purpose.
+//
+// Contact: lazybiz@yandex.ru
+//----------------------------------------------------------------------------
+
 #ifndef __WINDOW_H__
 #define __WINDOW_H__
 
