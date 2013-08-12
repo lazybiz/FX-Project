@@ -1,4 +1,4 @@
-APP = main
+APP = spots
 CFL = -c -Wall -std=c++11 -masm=intel -fopenmp -O3
 LFL = -s -static -mwindows
 SRC = $(APP).cpp
