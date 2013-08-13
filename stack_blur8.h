@@ -55,21 +55,8 @@ static uint8_t const g_stack_blur8_shr[255] = {
 	24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
 	24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24 };
 
-template <class T> class image {
-	T *		m_ptr;
-	int		m_width, m_height, m_stride;
-
-public:
-	image( T * p, int w, int h, int s ) : m_ptr(p), m_width(w), m_height(h), m_stride(s) {}
-
-	int width() const { return m_width; }
-	int height() const { return m_height; }
-	int stride() const { return m_stride; }
-	T * row_ptr( int y ) const { return m_ptr + y * m_stride; }
-	T * pix_ptr( int x, int y ) const { return row_ptr( y ) + x; }
-};
-
 class stack_blur8 {
+
 public:
 	void process( image <uint8_t> & img, unsigned rx, unsigned ry ) {
 		unsigned x, y, xp, yp, i;

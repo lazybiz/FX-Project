@@ -1,9 +1,9 @@
 APP = spots
-CFL = -c -Wall -std=c++11 -masm=intel -fopenmp -O3
+CFL = -c -Wall -std=c++11 -masm=intel -O3
 LFL = -s -static -mwindows
 SRC = $(APP).cpp
 OBJ = $(SRC:.cpp=.o)
-LIB = -lgomp -lgdi32
+LIB = -lgdi32
 
 all: $(OBJ)
 	g++ $(LFL) -o $(APP).exe $(OBJ) $(LIB)

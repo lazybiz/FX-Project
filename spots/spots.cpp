@@ -20,6 +20,7 @@
 #include <random>
 #include <vector>
 
+#include "../image.h"
 #include "../window.h"
 #include "../stack_blur8.h"
 
@@ -140,7 +141,7 @@ public:
 	}
 
 	~live_spot() {
-		delete [] m_temp_buffer.row_ptr( 0 );
+		delete [] m_temp_buffer.ptr();
 	}
 
 	void render( int w, int h ) {
