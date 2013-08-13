@@ -72,7 +72,7 @@ public:
 	uint32_t *	m_ptr;
 
 	typedef void (window::*ftbl_entry)( float, float, int );
-	ftbl_entry	m_event_table[7];
+	ftbl_entry	m_event_table[10];
 
 	window( int x, int y, int w, int h, int scale = 1 )
 		: m_w(w), m_h(h),
@@ -84,7 +84,10 @@ public:
 				&window::on_lbutton_dblclk,
 				&window::on_rbutton_down,
 				&window::on_rbutton_up,
-				&window::on_rbutton_dblclk } {
+				&window::on_rbutton_dblclk,
+				&window::on_mbutton_down,
+				&window::on_mbutton_up,
+				&window::on_mbutton_dblclk } {
 		if ( !m_ref_count ) {
 			WNDCLASS wc = {};
 			wc.lpfnWndProc		= window_proc;
@@ -167,6 +170,9 @@ public:
 	virtual void on_rbutton_down( float, float, int ) {}
 	virtual void on_rbutton_up( float, float, int ) {}
 	virtual void on_rbutton_dblclk( float, float, int ) {}
+	virtual void on_mbutton_down( float, float, int ) {}
+	virtual void on_mbutton_up( float, float, int ) {}
+	virtual void on_mbutton_dblclk( float, float, int ) {}
 
 	void idle( bool b_loop ) {
 		on_create();
