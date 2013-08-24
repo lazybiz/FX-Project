@@ -17,24 +17,26 @@
 #include <cstdio>
 #include <cmath>
 #include <cfloat>
+#include <omp.h>
 
 #include "../image.h"
 #include "../window.h"
 
-#define	DEF_ABC_OP( op )																									\
-	abc & operator op##= ( const abc & a ) { for ( size_t i = 0; i < size; i++ ) v[i] op##= a.v[i]; return *this; }			\
-	abc & operator op##= ( const T & value ) { for ( T & i : v ) i op##= value; return *this; }								\
-	abc operator op ( const abc & a ) { abc t = *this; for ( size_t i = 0; i < size; i++ ) t.v[i] op##= a.v[i]; return t; }	\
-	abc operator op ( const T & value ) { abc t = *this; t op##= value; return t; }
+#define	DEF_ABC_OP( op )																				\
+	abc & operator op##= ( const abc & z ) { a op##= z.a; b op##= z.b; c op##= z.c; return *this; }		\
+	abc & operator op##= ( const T & val ) { a op##= val; b op##= val; c op##= val; return *this; }		\
+	abc operator op ( const abc & z ) const { return abc( a op z.a, b op z.b, c op z.c ); }				\
+	abc operator op ( const T & val ) const { return abc( a op val, b op val, c op val ); }
 
-template <typename T, unsigned size> class abc {
-	T	v[size];
+template <typename T> class abc {
+	T	a, b, c;
 
 public:
 	abc() {}
-	abc( const abc & a ) { for ( size_t i = 0; i < size; i++ ) v[i] = a.v[i]; }
-	abc( T x, T y, T z ) : v{ x, y, z } {}
-	abc( T r, T g, T b, T a ) : v{ r, g, b, a } {}
+	abc( const abc & z ) : a(z.a), b(z.b), c(z.c) {}
+	abc( T x, T y, T z ) : a(x), b(y), c(z) {}
+
+	void set( T x, T y, T z ) { a = x; b = y; c = z; }
 
 	DEF_ABC_OP( + )
 	DEF_ABC_OP( - )
@@ -42,24 +44,22 @@ public:
 	DEF_ABC_OP( / )
 
 	uint32_t rgb32() const {
-		int r = v[0] * 255; if ( r < 0 ) r = 0; else if ( r > 255 ) r = 255;
-		int g = v[1] * 255; if ( g < 0 ) g = 0; else if ( g > 255 ) g = 255;
-		int b = v[2] * 255; if ( b < 0 ) b = 0; else if ( b > 255 ) b = 255;
+		int r = a * 255; if ( r < 0 ) r = 0; else if ( r > 255 ) r = 255;
+		int g = b * 255; if ( g < 0 ) g = 0; else if ( g > 255 ) g = 255;
+		int b = c * 255; if ( b < 0 ) b = 0; else if ( b > 255 ) b = 255;
 		return (r << 16) | (g << 8) | b;
 	}
 
-	abc & blend( const abc & a, T delta ) {
-		for ( size_t i = 0; i < size; i++ ) v[i] = v[i] * delta + a.v[i] * (1 - delta);
+	abc & blend( const abc & z, const T & delta ) {
+		a = a * delta + z.a * (1 - delta);
+		b = b * delta + z.b * (1 - delta);
+		c = c * delta + z.c * (1 - delta);
 		return *this;
 	}
 
-	void set( T r, T g, T b ) { v[0] = r; v[1] = g; v[2] = b; }
-
 	// dot product
-	inline T operator | ( const abc & a ) const {
-		T sum = 0;
-		for ( size_t i = 0; i < size; i++ ) sum += v[i] * a.v[i];
-		return sum;
+	inline T operator | ( const abc & z ) const {
+		return a * z.a + b * z.b + c * z.c;
 	}
 
 	inline T sqr_length() const { return *this | *this; }
@@ -69,19 +69,25 @@ public:
 		T sl = sqr_length();
 		if ( sl > 0 ) {
 			T inv_len = 1. / sqrt( sl );
-			for ( T & i : v ) i *= inv_len;
+			a *= inv_len;
+			b *= inv_len;
+			c *= inv_len;
 		}
-
 	}
 
-	// reflection
-	abc operator ^ ( abc & normal ) {
+	// cross product
+	abc cross( const abc & z ) const {
+		return abc( b * z.c - c * z.b, c * z.a - a * z.c, a * z.b - b * z.a );
+	}
+
+	// reflect
+	abc operator ^ ( const abc & normal ) const {
 		return *this + (normal * -((*this | normal) * 2) );
 	}
 };
 
-typedef abc <double, 3>	vec;
-typedef abc <double, 3>	rgb;
+typedef abc <double> vec;
+typedef abc <double> rgb;
 
 
 
@@ -224,8 +230,8 @@ public:
 		m_objs.push_back( new sphere( {    0,   0, 10000 },  9800, { .5, .5, .5 },  0 ) );
 
 		// render scene
-		int lines = 0;
-		for ( int y = 0; y < m_h; y++, lines++ ) {
+		#pragma omp parallel for
+		for ( int y = 0; y < m_h; y++ ) {
 			for ( int x = 0; x < m_w; x++ ) {
 				rgb accum( 0, 0, 0 );
 				for ( double sy = y - .5; sy < y + .5; sy += 1. / ss_size )
@@ -239,9 +245,10 @@ public:
 				accum /= ss_size_sqr;
 				m_ptr[m_w * y + x] = accum.rgb32();
 			}
-			if ( lines > 10 ) {
-				update();
-				lines = 0;
+
+			if ( omp_get_thread_num() == 0 ) {
+				if ( y % 5 == 0 )
+					update();
 			}
 		}
 		update();
@@ -250,7 +257,7 @@ public:
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hPInst, LPSTR lpCmdLine, int nCmdShow )
 {
-	the_ray_tracer rt( -1, -1, 640, 480 );
+	the_ray_tracer rt( -1, -1, 800, 600 );
 	rt.idle( false );
 	return 0;
 }
